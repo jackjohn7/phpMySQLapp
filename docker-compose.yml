@@ -1,0 +1,41 @@
+version: "3"
+services:
+  phpapp:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:80"
+    depends_on:
+      - db1
+      - db2
+  db1:
+    image: mysql:8.0
+    container_name: moviedb
+    environment:
+      MYSQL_ROOT_PASSWORD: admin
+      MYSQL_DATABASE: moviedb
+    volumes:
+      - moviedb-data:/var/lib/mysql
+      - ./mySqlDB/movieDB.sql:/docker-entrypoint-initdb.d/movieDB.sql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 45s
+      retries: 10
+  db2:
+    image: mysql:8.0
+    container_name: bookstore
+    environment:
+      MYSQL_ROOT_PASSWORD: admin
+      MYSQL_DATABASE: bookstore
+    volumes:
+      - bookstoredb-data:/var/lib/mysql
+      - ./mySqlDB/bookDB.sql:/docker-entrypoint-initdb.d/bookDB.sql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
+
+volumes:
+  bookstoredb-data:
+  moviedb-data:
